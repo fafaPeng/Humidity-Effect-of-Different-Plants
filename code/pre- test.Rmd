@@ -1,0 +1,80 @@
+---
+title: "pre-test"
+author: "shiqing Liu"
+date: '2023-04-10'
+output: html_document
+---
+
+```{r}
+setwd("C:/Users/chery/Desktop/403PROJECT")
+gh=read.table(file="pre_ex_v1.csv",header=TRUE,sep=",")
+gh=as.data.frame(gh)
+fit.lmerTest <- lmerTest::lmer(yield ~ humidity + plant + humidity:plant +
+                                 (1 | greenhouse), data=gh)
+gh$greenhouse=factor(gh$greenhouse)
+gh$pot=factor(gh$pot)
+gh$plant=factor(gh$plant)
+(num.gh=unique(gh$greenhouse))
+(num.gh=length(num.gh))
+vc <- VarCorr(fit.lmerTest)
+print(vc)
+
+
+delta = 0.1
+alpha = 0.05
+power = 0.8
+sigma = 1.34
+library(pwr)
+n = pwr.t.test(d = delta * sigma, sig.level = alpha, power = power, type = "two.sample", alternative = "two.sided")$n
+cat("The required sample size is", n, "\n")
+```
+
+
+
+
+
+error1=rnorm(num.gh, mean=0, sd=1.34)
+gh$error1=rep(error1,each=num.gh)
+gh
+(num.plants=length(gh$pot))
+gh$error2=rnorm(num.plants, mean=0, sd=0.44)
+gh
+(num.hum=length(gh$pot)/2)
+gh$humidity.effect[1:num.hum]=2
+gh$humidity.effect[(num.hum+1):length(gh$pot)]=1
+gh
+plant.effect=c(2,2,1,1)
+gh$plant.effect=rep(plant.effect,times=4)
+gh
+gh$yield=gh$humidity.effect+gh$plant.effect+gh$error1+gh$error2
+gh
+result <- aov(yield ~ humidity*plant + Error(greenhouse:humidity), data = gh)
+(x=summary(result))
+(x=x$`Error: Within`)
+(z=unlist(x))
+pval=z[18]
+0+(pval<0.05)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
